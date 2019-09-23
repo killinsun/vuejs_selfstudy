@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Vue.js self study</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src='https://unpkg.com/vue@2.5.17'></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href='css/style.css'>
+</head>
+
+<body>
+
+
+    <header id='header'>
+        <header-object></header-object>
+    </header>
+
+    <section>
+        <div class='container'>
+            <h1>TASK LIST</h1>
+            <div id='todo-app' class='container'>
+                <task v-for='task in tasks' v-bind:key='task.id' :task='task'></task>
+                <task-add></task-add>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+
+    </footer>
+
+    <!-- templates -->
+    <!-- header-->
+    <script type='text/x-template' id='header-template'>
+        <div id='header-template' class='container'>
+            <div>
+                <a href='index.html'>Vue.js self study</a>
+            </div>
+        </div>
+    </script>
+
+    <!-- ToDo-->
+    <script type='text/x-template' id='task-template'>
+        <form @submit.prevent='exec'>
+            <div class='row' :class='{task_done: task.isDone}'>
+                <div class='col-sm-10' @click='clickLabel()'> 
+                    <label v-show='!task.isFocus' class='task_name'>{{ task.name }} </label>
+                    <input type='text' class='form-control task_name' v-show='task.isFocus' v-model.lazy='task.name'>
+                </div>
+                <div class='col-sm-2'>
+                    <input :id='task.id' type='checkbox' class='checkbox_input' @click='toggleDone' v-model='task.isDone'>
+                    <label :for='task.id' class='check_css'></label>
+                </div>
+                <div class='hidden'>
+                    <button type='submit'></button>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <!-- Add task -->
+    <script type='text/x-template' id='task-add-template'>
+    <div class='row'>
+        <div class='col-sm-12'>
+            <button class='form-control btn-primary-1 rounded-pill' @click='addTask()'>ADD TASK</button>
+        </div>
+    </div>
+    </script>
+
+    <!-- /templates -->
+
+    <script type='text/javascript' src='js/app.js'></script>
+
+</body>
+
+</html>

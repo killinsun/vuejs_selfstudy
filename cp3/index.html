@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang='ja'>
+
+<head>
+    <title>はじめてのVue.js</title>
+    <script src='https://unpkg.com/vue@2.5.17'></script>
+</head>
+
+<body>
+    <div id='fruits-list'>
+        <page-header>
+            <h1 slot='header'>冬の果物</h1>
+        </page-header>
+        <ul>
+            <li>りんご</li>
+            <li>いちご</li>
+        </ul>
+    </div>
+
+
+    <script>
+        const headerTemplate = `
+            <div style='color: gray;'>
+            <slot name='header'>It's a default message</slot>
+        `
+
+        Vue.component('page-header', {
+            template: headerTemplate
+        });
+
+        new Vue({
+            el: '#fruits-list'
+        });
+
+
+    </script>
+    <div id='fruits-counter'>
+        <div v-for='fruit in fruits'>
+            {{fruit.name}}: <counter-button v-on:increment='incrementCartStatus()'></counter-button>
+        </div>
+        <p>合計: {{total}}</p>
+    </div>
+
+    <script>
+        const counterButton = Vue.extend({
+            template: '<span>{{counter}}個<button v-on:click="addToCart">追加</button></span>',
+            data: function () {
+                return {
+                    counter: 0
+                }
+            },
+            methods: {
+                addToCart: function () {
+                    this.counter += 1
+                    this.$emit('increment')
+                }
+            }
+        })
+
+        new Vue({
+            el: '#fruits-counter',
+            components: {
+                'counter-button': counterButton
+            },
+            data: {
+                total: 0,
+                fruits: [
+                    { name: '梨' },
+                    { name: 'イチゴ' }
+                ]
+            },
+            methods: {
+                incrementCartStatus: function () {
+                    this.total += 1
+                }
+            }
+        })
+
+    </script>
+</body>
+
+</html>

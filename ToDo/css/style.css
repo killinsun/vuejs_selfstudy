@@ -1,0 +1,106 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+header#header {
+    background: #44d9cd;
+    color: #e7faf8;
+    height: 60px;
+}
+
+header  a{
+    font-size: 38px;
+}
+header  a:link{ color: #e7faf8; }
+header  a:visited{ color: #e7faf8; }
+header  a:hover{ color: #e7faf8; }
+header  a:active{ color: #e7faf8; }
+
+
+.hidden{
+    display: none;
+}
+
+h1{
+    font-size: 30px
+}
+
+label.task_name{
+    font-size: 20px;
+}
+
+#todo-app{
+    border-radius:5px;
+}
+
+.task_done{
+    color: #a2b7b5 !important;
+    border-radius: 6px;
+}
+
+form > .row{
+    -webkit-transition: background-color 0.2s linear;
+    transition: background-color 0.2s linear;
+    border-radius: 5px;
+}
+form > .row:hover {
+    -webkit-transition: background-color 0.2s linear;
+    transition: background-color 0.2s linear;
+    background-color: #e7faf8;
+}
+
+input[type=checkbox] {
+    display: none;
+}
+.check_css {
+    -webkit-transition: background-color 0.2s linear;
+    transition: background-color 0.2s linear;
+    position: relative;
+    display: inline-block;
+    padding: 0 0 0 42px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.check_css:hover:after {
+    border-color: #0171bd;
+}
+.check_css:after {
+    -webkit-transition: border-color 0.2s linear;
+    transition: border-color 0.2s linear;
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    display: block;
+    margin-top: -10px;
+    width: 80%;
+    height: 30px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    content: '';
+}
+.check_css:before {
+    -webkit-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;
+    position: absolute;
+    top: 50%;
+    left: 25px;
+    display: block;
+    margin-top: -7px;
+    width: 10px;
+    height: 18px;
+    border-right: 3px solid #0171bd;
+    border-bottom: 3px solid #0171bd;
+    content: '';
+    opacity: 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+input[type=checkbox]:checked + .check_css:before {
+    opacity: 1;
+}
+
+button.btn-primary-1{
+    background-color: #44d9cd;
+}
+button.btn-primary-1:focus{
+    background-color: #36aca3;
+}

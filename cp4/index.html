@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang='ja'>
+
+<head>
+    <title>Vue Router SPA sample application</title>
+    <script src='https://unpkg.com/vue@2.5.17'></script>
+    <script src='https://unpkg.com/vue-router@3.0.1'></script>
+</head>
+
+<body>
+    <div id='app'>
+        <nav>
+            <!-- router-link によるナビゲーション定義-->
+            <router-link to='/top'>トップページ</router-link>
+            <router-link to='/users'>ユーザ一覧ページ</router-link>
+        </nav>
+        <router-view></router-view>
+    </div>
+
+    <!-- ここから以後書いていく-->
+    <!-- 必要な分のコンポーネントのテンプレート定義-->
+    <script type='text/x-template' id='user-list'>
+        <div>
+            <div class='loading' v-if='loading'> 読込中 ... </div>
+            <div v-if='error' class='error'>
+                {{ error }}
+            </div>
+            <!-- usersがロードされたら各ユーザの名前を表示する-->
+            <div v-for='user in users' :key='user.id'>
+                <h2>{{ user.name }}</h2>
+            </div>
+        </div>
+    </script>
+
+    <script type='text/x-template' id='user-detail'>
+        <div>
+            <div class='loading' v-if='loading'> 読込中 ... </div>
+            <div v-if='error' class='error'>
+                {{ error }}
+            </div>
+            <div v-if='user'>
+                <h2>{{ user.name }}</h2>
+                <p>{{ user.description }}</p>
+            </div>
+        </div>
+    </script>
+
+    <!-- いくつかのテンプレート定義が続く-->
+
+    <!-- 任意のJS実装-->
+    <script>
+        //ここにコンポーネントとルート定義からVueインスタンスの生成など
+        //ここにコードを書いていく
+        const getUsers = function (callback) {
+            setTimeout(function () {
+                callback(null, [
+                    {
+                        id: 1,
+                        name: 'Takuya Tejima',
+                        description: '東南アジアで働くエンジニアです'
+                    },
+                    {
+                        id: 2,
+                        name: 'Yohei Noda',
+                        description: 'アウトドア・フットサルが趣味のエンジニアです'
+                    }
+                ])
+            }, 1000)
+        };
+
+        const getUser = function (userId, callback) {
+            setTimeout(function () {
+                const filteredUsers = userData.filter(function (user) {
+                    return user.id === parseInt(userId, 10);
+                });
+                callback(null, filteredUsers && filteredUsers[0]);
+            }, 1000)
+        };
+
+        const UserDetail = {
+            template: '#user-detail',
+            data: function() {
+                return {
+                    loading: false,
+                    user: null,
+                    error: null
+                };
+            },
+            created: function() {
+                this.fetchData();
+            },
+            watch: {
+                '$route': 'fetchData'
+            },
+            methods: {
+                fetchData: function() {
+                    this.loading = true;
+                    getUser(this.$route.params.userId, (function(err, user){
+                        this.loading = false;
+                        if(err){
+                            this.error = err.toString();
+                        } else {
+                            this.user = user
+                        }
+                    }).bind(this))
+                }
+            }
+        }
+
+        const UserList = {
+            // HTML上のscriptタグのIDを指定する
+            template: '#user-list',
+            data: function () {
+                return {
+                    loading: false,
+                    users: function () { return [] },
+                    error: null
+                }
+            },
+            // 初期化時にデータを取得する
+            created: function () {
+                this.fetchData()
+            },
+            // $routeの変更をwatchすることでルーティングが変更された時に再度データを取得
+            watch: {
+                '$route': 'fetchData'
+            },
+            methods: {
+                fetchData: function () {
+                    this.loading = true;
+                    // 取得したデータの結果をusersに格納する
+                    // Function.prototype.bindはthisのスコープを渡すために利用
+                    getUsers((function (err, users) {
+                        this.loading = false;
+                        if (err) {
+                            this.error = err.toString();
+                        } else {
+                            this.users = users;
+                        }
+                    }).bind(this))
+                }
+            }
+        }
+
+        const router = new VueRouter({
+            routes: [
+                {
+                    path: '/top',
+                    component: {
+                        template: '<div>TOPページです</div>',
+                    }
+                },
+                {
+                    path: '/users',
+                    component: UserList
+
+                },
+                {
+                    path: '/users/:userId',
+                    component: UserDetail
+
+                }
+            ]
+        });
+
+        const app = new Vue({
+            router: router
+        }).$mount('#app');
+
+    </script>
+
+    <!-- ここまで-->
+</body>
+
+</html>
