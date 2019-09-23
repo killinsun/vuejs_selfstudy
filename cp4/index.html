@@ -3,6 +3,7 @@
 
 <head>
     <title>Vue Router SPA sample application</title>
+
     <script src='https://unpkg.com/vue@2.5.17'></script>
     <script src='https://unpkg.com/vue-router@3.0.1'></script>
 </head>
@@ -13,9 +14,11 @@
             <!-- router-link によるナビゲーション定義-->
             <router-link to='/top'>トップページ</router-link>
             <router-link to='/users'>ユーザ一覧ページ</router-link>
+            <router-link to='/users/new'>新規ユーザ作成ページ</router-link>
         </nav>
         <router-view></router-view>
     </div>
+
 
     <!-- ここから以後書いていく-->
     <!-- 必要な分のコンポーネントのテンプレート定義-->
@@ -27,7 +30,7 @@
             </div>
             <!-- usersがロードされたら各ユーザの名前を表示する-->
             <div v-for='user in users' :key='user.id'>
-                <h2>{{ user.name }}</h2>
+                <router-link :to="{ path: '/users/' + user.id }">{{ user.name }}</router-link>
             </div>
         </div>
     </script>
@@ -45,28 +48,46 @@
         </div>
     </script>
 
+    <script type='text/x-template' id='user-create'>
+        <div>
+            <div class='sending' v-if='sending'> Sending...</div>
+            <div>
+                <h2>新規ユーザ作成</h2>
+                <div>
+                    <label>名前: </label>
+                    <input type='text' v-model='user.name'>
+                </div>
+                <div>
+                    <label>説明文: </label>
+                    <textarea v-model='user.description'></textarea>
+                </div>
+                <div v-if='error' class='error'>
+                    {{ error }}
+                </div>
+                <div>
+                    <input type='button' @click='createUser' value='送信'>
+                </div>
+            </div>
+        </div>
+    </script>
     <!-- いくつかのテンプレート定義が続く-->
 
     <!-- 任意のJS実装-->
     <script>
         //ここにコンポーネントとルート定義からVueインスタンスの生成など
         //ここにコードを書いていく
-        const getUsers = function (callback) {
-            setTimeout(function () {
-                callback(null, [
-                    {
-                        id: 1,
-                        name: 'Takuya Tejima',
-                        description: '東南アジアで働くエンジニアです'
-                    },
-                    {
-                        id: 2,
-                        name: 'Yohei Noda',
-                        description: 'アウトドア・フットサルが趣味のエンジニアです'
-                    }
-                ])
-            }, 1000)
-        };
+        const userData = [
+            {
+                id: 1,
+                name: 'Takuya Tejima',
+                description: '東南アジアで働くエンジニアです'
+            },
+            {
+                id: 2,
+                name: 'Yohei Noda',
+                description: 'アウトドア・フットサルが趣味のエンジニアです'
+            }
+        ];
 
         const getUser = function (userId, callback) {
             setTimeout(function () {
@@ -74,30 +95,87 @@
                     return user.id === parseInt(userId, 10);
                 });
                 callback(null, filteredUsers && filteredUsers[0]);
+            }, 1000);
+        };
+
+        const getUsers = function (callback) {
+            setTimeout(function () {
+                callback(null, userData);
             }, 1000)
         };
 
+        const postUser = function (params, callback) {
+            setTimeout(function () {
+                params.id = userData.length + 1;
+                userData.push(params);
+                callback(null, params);
+            }, 1000)
+        }
+
+        const UserCreate = {
+            template: '#user-create',
+            data: function () {
+                return {
+                    sending: false,
+                    user: this.defaultUser(),
+                    error: null
+                }
+            },
+            created: function () {
+            },
+            methods: {
+                defaultUser: function () {
+                    return {
+                        name: '',
+                        description: ''
+                    }
+                },
+                createUser: function () {
+                    if (this.user.name.trim() === '') {
+                        this.error = 'Nameは必須です';
+                        return
+                    }
+                    if (this.user.description.trim() === '') {
+                        this.error = 'Descriptionは必須です';
+                        return
+                    }
+
+                    postUser(this.user, (function (err, user) {
+                        this.sending = false;
+                        if (err) {
+                            this.error = err.toString();
+                        } else {
+                            this.error = null;
+                            this.user = this.defaultUser();
+                            alert('新規ユーザが登録されました');
+                            this.$router.push('/users');
+                        }
+                    }).bind(this));
+                }
+            }
+        }
+
         const UserDetail = {
             template: '#user-detail',
-            data: function() {
+            data: function () {
                 return {
                     loading: false,
                     user: null,
                     error: null
                 };
             },
-            created: function() {
+            created: function () {
                 this.fetchData();
             },
             watch: {
                 '$route': 'fetchData'
             },
             methods: {
-                fetchData: function() {
+                fetchData: function () {
                     this.loading = true;
-                    getUser(this.$route.params.userId, (function(err, user){
+                    getUser(this.$route.params.userId, (function (err, user) {
                         this.loading = false;
-                        if(err){
+                        if (err) {
                             this.error = err.toString();
                         } else {
                             this.user = user
@@ -154,6 +232,10 @@
                     path: '/users',
                     component: UserList
 
+                },
+                {
+                    path: '/users/new',
+                    component: UserCreate
                 },
                 {
                     path: '/users/:userId',
