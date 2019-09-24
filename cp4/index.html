@@ -15,6 +15,8 @@
             <router-link to='/top'>トップページ</router-link>
             <router-link to='/users'>ユーザ一覧ページ</router-link>
             <router-link to='/users/new'>新規ユーザ作成ページ</router-link>
+            <router-link to="/login" v-show="!Auth.loggedIn()">ログイン</router-link>
+            <router-link to="/logout" v-show="Auth.loggedIn()">ログアウト</router-link>
         </nav>
         <router-view></router-view>
     </div>
@@ -70,186 +72,26 @@
             </div>
         </div>
     </script>
+
+    <script type='text/x-template' id='login'>
+        <div>
+            <h2>Login</h2>
+            <p v-if='$route.query.redirect'>
+                ログインしてください
+            </p>
+            <form @submit.prevent='login'>
+                <label><input v-model='email' placeholder='email'></label>
+                <label><input v-model='pass' placeholder='password' type='password'></label><br>
+                <button type='submit'>ログイン</button>
+                <p v-if='error' class='error'>>ログインに失敗しました</p>
+            </form>
+        </div>
+    </script>
+
     <!-- いくつかのテンプレート定義が続く-->
 
     <!-- 任意のJS実装-->
-    <script>
-        //ここにコンポーネントとルート定義からVueインスタンスの生成など
-        //ここにコードを書いていく
-        const userData = [
-            {
-                id: 1,
-                name: 'Takuya Tejima',
-                description: '東南アジアで働くエンジニアです'
-            },
-            {
-                id: 2,
-                name: 'Yohei Noda',
-                description: 'アウトドア・フットサルが趣味のエンジニアです'
-            }
-        ];
-
-        const getUser = function (userId, callback) {
-            setTimeout(function () {
-                const filteredUsers = userData.filter(function (user) {
-                    return user.id === parseInt(userId, 10);
-                });
-                callback(null, filteredUsers && filteredUsers[0]);
-            }, 1000);
-        };
-
-        const getUsers = function (callback) {
-            setTimeout(function () {
-                callback(null, userData);
-            }, 1000)
-        };
-
-        const postUser = function (params, callback) {
-            setTimeout(function () {
-                params.id = userData.length + 1;
-                userData.push(params);
-                callback(null, params);
-            }, 1000)
-        }
-
-        const UserCreate = {
-            template: '#user-create',
-            data: function () {
-                return {
-                    sending: false,
-                    user: this.defaultUser(),
-                    error: null
-                }
-            },
-            created: function () {
-            },
-            methods: {
-                defaultUser: function () {
-                    return {
-                        name: '',
-                        description: ''
-                    }
-                },
-                createUser: function () {
-                    if (this.user.name.trim() === '') {
-                        this.error = 'Nameは必須です';
-                        return
-                    }
-                    if (this.user.description.trim() === '') {
-                        this.error = 'Descriptionは必須です';
-                        return
-                    }
-
-                    postUser(this.user, (function (err, user) {
-                        this.sending = false;
-                        if (err) {
-                            this.error = err.toString();
-                        } else {
-                            this.error = null;
-                            this.user = this.defaultUser();
-                            alert('新規ユーザが登録されました');
-                            this.$router.push('/users');
-                        }
-                    }).bind(this));
-                }
-            }
-        }
-
-        const UserDetail = {
-            template: '#user-detail',
-            data: function () {
-                return {
-                    loading: false,
-                    user: null,
-                    error: null
-                };
-            },
-            created: function () {
-                this.fetchData();
-            },
-            watch: {
-                '$route': 'fetchData'
-            },
-            methods: {
-                fetchData: function () {
-                    this.loading = true;
-                    getUser(this.$route.params.userId, (function (err, user) {
-                        this.loading = false;
-                        if (err) {
-                            this.error = err.toString();
-                        } else {
-                            this.user = user
-                        }
-                    }).bind(this))
-                }
-            }
-        }
-
-        const UserList = {
-            // HTML上のscriptタグのIDを指定する
-            template: '#user-list',
-            data: function () {
-                return {
-                    loading: false,
-                    users: function () { return [] },
-                    error: null
-                }
-            },
-            // 初期化時にデータを取得する
-            created: function () {
-                this.fetchData()
-            },
-            // $routeの変更をwatchすることでルーティングが変更された時に再度データを取得
-            watch: {
-                '$route': 'fetchData'
-            },
-            methods: {
-                fetchData: function () {
-                    this.loading = true;
-                    // 取得したデータの結果をusersに格納する
-                    // Function.prototype.bindはthisのスコープを渡すために利用
-                    getUsers((function (err, users) {
-                        this.loading = false;
-                        if (err) {
-                            this.error = err.toString();
-                        } else {
-                            this.users = users;
-                        }
-                    }).bind(this))
-                }
-            }
-        }
-
-        const router = new VueRouter({
-            routes: [
-                {
-                    path: '/top',
-                    component: {
-                        template: '<div>TOPページです</div>',
-                    }
-                },
-                {
-                    path: '/users',
-                    component: UserList
-
-                },
-                {
-                    path: '/users/new',
-                    component: UserCreate
-                },
-                {
-                    path: '/users/:userId',
-                    component: UserDetail
-
-                }
-            ]
-        });
-
-        const app = new Vue({
-            router: router
-        }).$mount('#app');
-
-    </script>
+    <script src='js/script.js'></script>
 
     <!-- ここまで-->
 </body>
